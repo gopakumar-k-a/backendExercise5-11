@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>geeksenergy</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/bs-brain@2.0.4/components/logins/login-5/assets/css/login-5.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+      crossorigin="anonymous"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    .login_oueter {
+      width: 360px;
+      max-width: 100%;
+    }
+    .logo_outer {
+      text-align: center;
+    }
+    .logo_outer img {
+      width: 120px;
+      margin-bottom: 40px;
+    }
+  </style>
+  <body>
+    <div class="container-fluid">
+      <div
+        class="row d-flex justify-content-center align-items-center m-0"
+        style="height: 100vh"
+      >
+        <div class="login_oueter">
+          <% if (locals.error || locals.success) { %>
+          <div class="container mt-5">
+            <% if (locals.error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+            <% } %> <% if (locals.success) { %>
+            <div class="alert alert-success"><%= success %></div>
+            <% } %>
+          </div>
+          <% } %>
+
+          <form
+            id="login"
+            class="bg-light border p-3"
+            onsubmit="handleLogin(event)"
+          >
+            <div class="form-row">
+              <h4 class="title my-3">Login For Access</h4>
+              <div class="col-12">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1"
+                      ><i class="fas fa-user"></i
+                    ></span>
+                  </div>
+                  <input
+                    name="email"
+                    type="text"
+                    value=""
+                    class="input form-control"
+                    id="email"
+                    placeholder="Username"
+                    aria-label="Username"
+                    aria-describedby="basic-addon1"
+                  />
+                </div>
+                <div id="addressErr" class="text-danger"></div>
+              </div>
+              <div class="col-12">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1"
+                      ><i class="fas fa-lock"></i
+                    ></span>
+                  </div>
+                  <input
+                    name="password"
+                    type="password"
+                    value=""
+                    class="input form-control"
+                    id="password"
+                    placeholder="password"
+                    required="true"
+                    aria-label="password"
+                    aria-describedby="basic-addon1"
+                  />
+                  <div class="input-group-append">
+                    <span
+                      class="input-group-text"
+                      onclick="password_show_hide();"
+                    >
+                      <i class="fas fa-eye" id="show_eye"></i>
+                      <i class="fas fa-eye-slash d-none" id="hide_eye"></i>
+                    </span>
+                  </div>
+                </div>
+                <div id="passwordErr" class="text-danger"></div>
+              </div>
+              <div class="col-6"></div>
+              <div id="error-message" class="text-danger"></div>
+              <div class="col-sm-12 pt-3 text-right">
+                <p>Already registered <a href="/register">Register</a></p>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-primary" type="submit" name="signin">
+                  Login
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      function password_show_hide() {
+        var x = document.getElementById("password");
+        var show_eye = document.getElementById("show_eye");
+        var hide_eye = document.getElementById("hide_eye");
+        hide_eye.classList.remove("d-none");
+        if (x.type === "password") {
+          x.type = "text";
+          show_eye.style.display = "none";
+          hide_eye.style.display = "block";
+        } else {
+          x.type = "password";
+          show_eye.style.display = "block";
+          hide_eye.style.display = "none";
+        }
+      }
+
+      async function handleLogin(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        console.log("email ", email);
+        console.log("password ", password);
+
+        const errorMessage = document.getElementById("error-message");
+        if (!email || !password) {
+          errorMessage.textContent = "Email and password should not be empty";
+          return;
+        }
+        try {
+          const response = await axios.post("/login", { email, password });
+          if (response?.data?.redirect) {
+            window.location.href = response.data.redirect;
+          } else {
+            errorMessage.textContent = response.data.message || "Login failed";
+          }
+        } catch (error) {
+          errorMessage.textContent =
+            "An error occurred: " + error.response.data.message;
+        }
+      }
+    </script>
+  </body>
+</html>
